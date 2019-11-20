@@ -40,8 +40,8 @@ sprintf("The rate of survival is higher among the %s sex group",answer)
 **2) Some insect species can only survive if daily temperatures stay above some temperature.  Write a function that takes two arguments, a data frame and a temperature that returns a TRUE when the tmin > X and a FALSE when tmin is < X, where X is the threshold temperature.  Have the function then add a logical vector to each daily climate data frame reporting whether that threshold was exceeded (TRUE) or not (FALSE). Apply this function across all three of the daily data frames provided in /data. For each data frame, your results might look like:**
 ```{r}
 temp_check <- function(data, thresh){
-  data <- read.csv(data, skip = 10)
-  threshold <- data$tmin..degrees.C. > thresh
+  data <- read.csv("./data/cv_grid1_daily.csv", col.names = c("pdate", "ppt", "tmin", "tmean", "tmax") ,skip = 11, header=F)
+  threshold <- data$tmin > thresh
   data <- cbind(data,threshold)
   return(data)
 }
@@ -52,7 +52,7 @@ temp_check <- function(data, thresh){
 X <- list("./data/cv_grid1_daily.csv","./data/cv_grid2_daily.csv","./data/cv_grid3_daily.csv")
 
 #test for a threshold of -4
-lapply(X, temp_check, 0)
+lapply(X, temp_check, -4)
 ```
 
 
@@ -70,18 +70,23 @@ lapply(X, temp_check, 0)
 ```options(noaakey="your_noaa_token")``` 
 and store it at the top of your project directory.    
 + stationid='GHCND:ASN00091245'  
-+ Not all years have data!   
++ Not all years have data! 
+```{r}
+data <- data.frame()
+for (year in seq(1985,2019)){
+  temp_data <- ncdc(datasetid='GSOM', stationid = 'GHCND:ASN00091245', datatypeid='TAVG', startdate = paste0(year,"-01-01"), enddate = paste0(year,"-12-01"), limit = 100, add_units=TRUE)$data
+  data<-rbind(data,temp_data)
+}
 
-**4) Calculate the average annual temperature and the number of months used to generate that mean from #3 above (years without data can be excluded).  Report in a table, for example:**
-```{r, echo = FALSE}
-yrs <- c(1985, 1986, 1990)
-tavg <- c(12.90750, 12.39750, 11.73167)
-mons <- c(4, 12, 6)
-my_table2 <- data.frame("Year" = yrs, "Tavg" = tavg, "Mons" = mons)
-my_table2 %>%
-  kable(digits=3) %>%
-  kable_styling()
 ```
 
-
-
+**4) Calculate the average annual temperature and the number of months used to generate that mean from #3 above (years without data can be excluded).  Report in a table, for example:**
+```{r}
+annual_avg_temp <- data.frame()
+for (year in seq(1985,2019)){
+  tavg <- mean(data[grep(paste0("^",year), data$date),]$value)
+  mons <- length(data[grep(paste0("^",year), data$date),]$value)
+  new_data <- data.frame("Year" = year, "Tavg" = tavg, "Mons" = mons)
+  annual_avg_temp <- rbind(annual_avg_temp, new_data)
+}
+```

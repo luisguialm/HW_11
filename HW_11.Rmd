@@ -18,21 +18,43 @@ data(Titanic) will return a 4-d array resulting from the cross-tabulation of 220
 
 **1) Using the R data Titanic, use apply to answer the following:**  
 
-+ Were rates of survival higher among children or adults?  
-+ Were rates of survival higher among men or women?  
++ Were rates of survival higher among children or adults?
+```{r}
+survival_age <- data.frame(apply(Titanic, c(3, 4), sum))
+survival_rate <- survival_age$Yes/(survival_age$Yes + survival_age$No)
+survival_age <- cbind(survival_age,survival_rate)
+answer <- rownames(survival_age)[which.max(survival_age$survival_rate)]
+sprintf("The rate of survival is higher among the %s age group",answer)
+```
+
++ Were rates of survival higher among men or women?
+```{r}
+survival_sex <- data.frame(apply(Titanic, c(2, 4), sum))
+survival_rate <- survival_sex$Yes/(survival_sex$Yes + survival_sex$No)
+survival_sex <- cbind(survival_sex,survival_rate)
+answer <- rownames(survival_sex)[which.max(survival_sex$survival_rate)]
+sprintf("The rate of survival is higher among the %s sex group",answer)
+```
 
 #### lapply
 **2) Some insect species can only survive if daily temperatures stay above some temperature.  Write a function that takes two arguments, a data frame and a temperature that returns a TRUE when the tmin > X and a FALSE when tmin is < X, where X is the threshold temperature.  Have the function then add a logical vector to each daily climate data frame reporting whether that threshold was exceeded (TRUE) or not (FALSE). Apply this function across all three of the daily data frames provided in /data. For each data frame, your results might look like:**
-
-```{r, echo = FALSE}
-col_names <- c("pdate",  "ppt",    "tmin",   "tmean",  "tmax",   "thresh")
-vals <- c(1981-01-01, 3.78, -4.3,  -1.9,  0.5,  "FALSE")
-names(vals) <- col_names
-my_table <- data.frame(t(vals))
-my_table %>%
-  kable() %>%
-  kable_styling()
+```{r}
+temp_check <- function(data, thresh){
+  data <- read.csv(data, skip = 10)
+  threshold <- data$tmin..degrees.C. > thresh
+  data <- cbind(data,threshold)
+  return(data)
+}
 ```
+
+```{r}
+#a list containing the path to the data
+X <- list("./data/cv_grid1_daily.csv","./data/cv_grid2_daily.csv","./data/cv_grid3_daily.csv")
+
+#test for a threshold of -4
+lapply(X, temp_check, 0)
+```
+
 
 *Hints:*  
 

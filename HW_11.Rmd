@@ -84,7 +84,7 @@ temp_check <- function(data, thresh){
 To utilize the function, we can simply use `lapply`, as follows:
 ```{r }
 test<-lapply(mydata,temp_check,-5) #testing function
-knitr::kable(head(test$grid1,2)) #showing results
+knitr::kable(head(test$grid1,2)) %>% kable_styling() #showing results
 ```
 
 # Question 3:

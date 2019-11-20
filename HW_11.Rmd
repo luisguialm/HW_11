@@ -1,7 +1,7 @@
 ---
 title: "HW_11"
-author: "Amy Hessl"
-date: "11/8/2019"
+author: "Tobi Ore"
+date: "11/20/2019"
 output: html_document
 ---
 
@@ -12,9 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r, include=FALSE}
 library(kableExtra)
 ```
-
-#### apply
-data(Titanic) will return a 4-d array resulting from the cross-tabulation of 2201 observations on 4 variables.  The data were originally collected by the British Board of Trade in their investigations related to the sinking of the Titanic.
 
 **1) Using the R data Titanic, use apply to answer the following:**  
 
@@ -36,7 +33,6 @@ answer <- rownames(survival_sex)[which.max(survival_sex$survival_rate)]
 sprintf("The rate of survival is higher among the %s sex group",answer)
 ```
 
-#### lapply
 **2) Some insect species can only survive if daily temperatures stay above some temperature.  Write a function that takes two arguments, a data frame and a temperature that returns a TRUE when the tmin > X and a FALSE when tmin is < X, where X is the threshold temperature.  Have the function then add a logical vector to each daily climate data frame reporting whether that threshold was exceeded (TRUE) or not (FALSE). Apply this function across all three of the daily data frames provided in /data. For each data frame, your results might look like:**
 ```{r}
 temp_check <- function(data, thresh){
@@ -53,24 +49,10 @@ X <- list("./data/cv_grid1_daily.csv","./data/cv_grid2_daily.csv","./data/cv_gri
 
 #test for a threshold of -4
 lapply(X, temp_check, -4)
-```
-
-
-*Hints:*  
-
-+ Read in the prism daily data files in /data using your prismDat function you made in class.    
-+ Write a function that works for a single data frame from the list.  
-+ Write an apply function to 'apply' your function across all the data frames in the list.  
+```  
 
 **3) Write a loop to extract Cape Grim monthly temperature data (GHCN) for 1985-2019 using rnoaa.**
 
-*Hints:*  
-
-+ Request a token from rnoaa. Make a .Rprofile text file (no extension) containing:  
-```options(noaakey="your_noaa_token")``` 
-and store it at the top of your project directory.    
-+ stationid='GHCND:ASN00091245'  
-+ Not all years have data! 
 ```{r}
 data <- data.frame()
 for (year in seq(1985,2019)){

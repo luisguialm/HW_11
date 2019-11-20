@@ -1,23 +1,22 @@
 
 # Question 1:
-``` {r echo=FALSE}
+In order to solve Q1. we used the `apply` function called `aggregate`:
+```{r}
 data(Titanic)
 Titanic<-as.data.frame(Titanic)
-survival_age<-aggregate(Freq~Age+Survived,data=Titanic,sum)
+Survival_age<-aggregate(Freq~Age+Survived,data=Titanic,sum)
 children_rate<-Survival_age$Freq[3]/(Survival_age$Freq[3]+Survival_age$Freq[1])
 adult_rate<-Survival_age$Freq[4]/(Survival_age$Freq[2]+Survival_age$Freq[4])
-survival_sex<-aggregate(Freq~Sex+Survived,data=Titanic,sum)
+Survival_sex<-aggregate(Freq~Sex+Survived,data=Titanic,sum)
 men_rate<-Survival_sex$Freq[3]/(Survival_sex$Freq[3]+Survival_sex$Freq[1])
 women_rate<-Survival_sex$Freq[4]/(Survival_sex$Freq[2]+Survival_sex$Freq[4])
 
 ```
-
-Based on the analysis, we can conclude that, as expected, children (`r children_rate`) and women (`r women_rate`) had higher survival rates than adults (`r adult_rate`) and Men (`r men_rate`). 
+Based on the analysis, we can conclude that, as expected, children (`r round(children_rate,2)`) and women (`r round(women_rate,2)`) had higher survival rates than adults (`r round(adult_rate,2)`) and men (`r round(men_rate,2)`). 
 
 # Question 2:
-
-``` {r echo} 
-Declaring the function:
+Q2 was done in two steps. First, we created the list of data frames:
+``` {r } 
 prismDat<-function(path){
   data.path<-path
   prism.files<-list.files(path)
@@ -35,7 +34,7 @@ mydata<-prismDat("data/") # retrieving the data
 
 ```
 
-Now we make the second function:
+Then, we made a function to find the TRUE/FALSE for a given threshold temperature:
 ``` {r }
 temp_min<-function(df,threshold){ #function to check threshold and  write new dataframe
   for(i  in 1:nrow(df)){
@@ -49,29 +48,41 @@ temp_min<-function(df,threshold){ #function to check threshold and  write new da
   return(df)
 }#end function
 ```
-We can apply to function using `lapply`, as follows:
+To utilize the function, we can simply use `lapply`, as follows:
 ```{r }
 test<-lapply(mydata,temp_min,5) #testing function
-head(test$grid1,2) #showing results
+knitr::kable(head(test$grid1,2)) #showing results
 ```
+
 # Question 3:
 
+Q3 requires to load several libraries to the environment. The personal NOAA key also needs to be declared to access the data from NCDC:
+```{r, include=FALSE}
+mykey<-"iczdfxvFGPnTLpqiOCvbjsIpOhTFMUTi"
+```
+```{r, message=FALSE}
 library(rnoaa)
 library(lubridate)
 library(dplyr)
-options(nooakey ="iczdfxvFGPnTLpqiOCvbjsIpOhTFMUTi")
-
+options(nooakey = mykey)
+```
+The next step is to create a loop that retrieves every year's timeseries from NOAA's website. 
+```{r, warning=FALSE}
 capeGrimpTemp<-c()
 for(i in 1985:2019){
   ini<-paste0(i,"-01-01")
   fin<-paste0(i,"-12-31")
   temp<-ncdc(datasetid='GSOM', stationid = 'GHCND:ASN00091245', datatypeid='TAVG', startdate = ini, enddate = fin, add_units=TRUE)
   capeGrimpTemp<-rbind(capeGrimpTemp,temp$data)
-  }
+}
+```
+After we have done that procedure, we can rearrange the data to find the mean temperature and the number of months. We use the function `aggregate`, with a specific margin, in our case the years. 
+```{r}
 kiwi<-capeGrimpTemp
 kiwi$date<-as.Date(substr(kiwi$date,1,10))
 kiwi_result<-round(aggregate(kiwi$value,by=list(year(kiwi$date)),mean),3)
 kiwi_count<-aggregate(kiwi$date,by=list(year(kiwi$date)),length)
 kiwi_result<-cbind(kiwi_result,kiwi_count$x)
 names(kiwi_result)<-c("Year","Tavg","Mons")
-head(kiwi_result)
+knitr::kable(head(kiwi_result),align = 'c',caption = "Mean Annual Temperature for Cape Grimp, NZ ")
+```

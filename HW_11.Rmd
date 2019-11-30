@@ -51,6 +51,7 @@ women_rate<-Survival_sex$Freq[4]/(Survival_sex$Freq[2]+Survival_sex$Freq[4])
 ```
 Based on the analysis, we can conclude that, as expected, children (`r round(children_rate,2)`) and women (`r round(women_rate,2)`) had higher survival rates than adults (`r round(adult_rate,2)`) and men (`r round(men_rate,2)`). 
 
+
 # Question 2:
 
 Q2 was done in two steps. First, we created the list of data frames:
@@ -121,7 +122,7 @@ kiwi_result<-cbind(kiwi_result,kiwi_count$x)
 names(kiwi_result)<-c("Year","Tavg","Mons")
 knitr::kable(head(kiwi_result),align = 'c',caption = "Mean Annual Temperature for Cape Grimp, NZ ")%>% kable_styling()
 ```
-
+### Except Cape Grim is in Australia - so Oz!
 Second alternative (that also shows the years with missing values):
 ```{r}
 annual_avg_temp <- data.frame()
